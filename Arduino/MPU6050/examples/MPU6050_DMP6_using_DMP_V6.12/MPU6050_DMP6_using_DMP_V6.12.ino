@@ -57,7 +57,7 @@ void setup()
   // supply your own gyro offsets here, scaled for min sensitivity
   mpu.setXGyroOffset(51);
   mpu.setYGyroOffset(8);
-  mpu.setZGyroOffset(-32);
+  mpu.setZGyroOffset(0);
   mpu.setXAccelOffset(1150);
   mpu.setYAccelOffset(-50);
   mpu.setZAccelOffset(1060);
@@ -110,7 +110,7 @@ void loop()
 
     Serial.print("GyroZ: ");
     Serial.print(gy.z);
-    Serial.print(" yaw: ");
+    Serial.print(" yaw: "); 
     Serial.print(ypr[0] * 180 / M_PI);
     Serial.print(" off: ");
     Serial.print(yawOffset);

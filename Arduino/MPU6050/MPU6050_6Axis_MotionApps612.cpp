@@ -823,6 +823,8 @@ uint8_t MPU6050::dmpInitialize() { // Lets get it over with fast Write everythin
   // Reset procedure per instructions in the "MPU-6000/MPU-6050 Register Map and Descriptions" page 41
 	I2Cdev::writeBit(devAddr,0x6B, 7, (val = 1), wireObj); //PWR_MGMT_1: reset with 100ms delay
 	delay(100);
+    I2Cdev::writeByte(devAddr,0x6B,(val = 0), wireObj); //Wake up the chip
+    delay(100);
 	I2Cdev::writeBits(devAddr,0x6A, 2, 3, (val = 0b111), wireObj); // full SIGNAL_PATH_RESET: with another 100ms delay
 	delay(100);         
 	I2Cdev::writeBytes(devAddr,0x6B, 1, &(val = 0x01), wireObj); // 1000 0001 PWR_MGMT_1:Clock Source Select PLL_X_gyro
@@ -833,7 +835,7 @@ uint8_t MPU6050::dmpInitialize() { // Lets get it over with fast Write everythin
 	I2Cdev::writeBytes(devAddr,0x6B, 1, &(val = 0x01), wireObj); // 0000 0001 PWR_MGMT_1: Clock Source Select PLL_X_gyro
 	I2Cdev::writeBytes(devAddr,0x19, 1, &(val = 0x04), wireObj); // 0000 0100 SMPLRT_DIV: Divides the internal sample rate 400Hz ( Sample Rate = Gyroscope Output Rate / (1 + SMPLRT_DIV))
 	I2Cdev::writeBytes(devAddr,0x1A, 1, &(val = 0x01), wireObj); // 0000 0001 CONFIG: Digital Low Pass Filter (DLPF) Configuration 188HZ  //Im betting this will be the beat
-	if (!writeProgMemoryBlock(dmpMemory2, MPU6050_DMP_CODE_SIZE)) return 1; // Loads the DMP image into the MPU6050 Memory // Should Never Fail
+	if (!writeProgMemoryBlock(dmpMemory, MPU6050_DMP_CODE_SIZE)) return 1; // Loads the DMP image into the MPU6050 Memory // Should Never Fail
 	I2Cdev::writeWords(devAddr, 0x70, 1, &(ival = 0x0400), wireObj); // DMP Program Start Address
 	I2Cdev::writeBytes(devAddr,0x1B, 1, &(val = 0x18), wireObj); // 0001 1000 GYRO_CONFIG: 3 = +2000 Deg/sec
 	I2Cdev::writeBytes(devAddr,0x6A, 1, &(val = 0xC0), wireObj); // 1100 1100 USER_CTRL: Enable Fifo and Reset Fifo
@@ -841,10 +843,10 @@ uint8_t MPU6050::dmpInitialize() { // Lets get it over with fast Write everythin
 	I2Cdev::writeBit(devAddr,0x6A, 2, 1, wireObj);      // Reset FIFO one last time just for kicks. (MPUi2cWrite reads 0x6A first and only alters 1 bit and then saves the byte)
 
     Serial.println("Enabling DMP Features....");
-    dmpEnableFeature(DMP_FEATURE_6X_LP_QUAT | DMP_FEATURE_TAP |
-                    DMP_FEATURE_ANDROID_ORIENT | DMP_FEATURE_SEND_RAW_ACCEL | 
-                    DMP_FEATURE_SEND_CAL_GYRO);
-    int ret = dmp_set_fifo_rate(DEFAULT_MPU_HZ);
+    // dmpEnableFeature(DMP_FEATURE_6X_LP_QUAT | DMP_FEATURE_TAP |
+    //                 DMP_FEATURE_ANDROID_ORIENT | DMP_FEATURE_SEND_RAW_ACCEL | 
+    //                 DMP_FEATURE_SEND_CAL_GYRO);
+    // int ret = dmp_set_fifo_rate(DEFAULT_MPU_HZ);
     // Serial.print("Setting fifo rate exit code: ");
     // Serial.println(ret);
 
@@ -855,7 +857,8 @@ uint8_t MPU6050::dmpInitialize() { // Lets get it over with fast Write everythin
     dmpPacketSize += 6;//DMP_FEATURE_SEND_RAW_ACCEL
     dmpPacketSize += 6;//DMP_FEATURE_SEND_RAW_GYRO
 */
-	dmpPacketSize = 32;
+    dmpPacketSize = 28;
+	// dmpPacketSize = 32;
 	return 0;
 }
 
