@@ -143,6 +143,26 @@ class MPU6050_6Axis_MotionApps612 : public MPU6050_Base {
         uint16_t dmpGetFIFOPacketSize();
         uint8_t dmpGetCurrentFIFOPacket(uint8_t *data); // overflow proof
 
+        int dmpSetEnableGyroCalibration(unsigned char enable);
+        int dmpEnableFeature(unsigned short mask);
+
+        int dmp_set_tap_thresh(unsigned char axis, unsigned short thresh);
+        int dmp_set_tap_axes(unsigned char axis);
+        /**
+ *  @brief      Set minimum number of taps needed for an interrupt.
+ *  @param[in]  min_taps    Minimum consecutive taps (1-4).
+ *  @return     0 if successful.
+ */
+int dmp_set_tap_count(unsigned char min_taps);
+int dmp_set_tap_time(unsigned short time);
+int dmp_set_tap_time_multi(unsigned short time);
+int dmp_set_shake_reject_thresh(long sf, unsigned short thresh);
+int dmp_set_shake_reject_time(unsigned short time);
+int dmp_set_shake_reject_timeout(unsigned short time);
+int dmp_enable_lp_quat(unsigned char enable);
+int dmp_enable_6x_lp_quat(unsigned char enable);
+int dmp_set_fifo_rate(unsigned short rate);
+
     private:
         uint8_t *dmpPacketBuffer;
         uint16_t dmpPacketSize;

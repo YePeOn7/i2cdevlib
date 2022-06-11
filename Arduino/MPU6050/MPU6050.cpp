@@ -56,7 +56,7 @@ MPU6050_Base::MPU6050_Base(uint8_t address, void *wireObj):devAddr(address), wir
  */
 void MPU6050_Base::initialize() {
     setClockSource(MPU6050_CLOCK_PLL_XGYRO);
-    setFullScaleGyroRange(MPU6050_GYRO_FS_250);
+    setFullScaleGyroRange(MPU6050_GYRO_FS_2000);
     setFullScaleAccelRange(MPU6050_ACCEL_FS_2);
     setSleepEnabled(false); // thanks to Jack Elston for pointing this one out!
 }
@@ -2776,7 +2776,6 @@ void MPU6050_Base::setFIFOTimeout(uint32_t fifoTimeout) {
      bool packetReceived = false;
      do {
          if ((fifoC = getFIFOCount())  > length) {
-
              if (fifoC > 200) { // if you waited to get the FIFO buffer to > 200 bytes it will take longer to get the last packet in the FIFO Buffer than it will take to  reset the buffer and wait for the next to arrive
                  resetFIFO(); // Fixes any overflow corruption
                  fifoC = 0;
@@ -3394,4 +3393,60 @@ void MPU6050_Base::PrintActiveOffsets() {
     Serial.print((float)offsets[3], 5); Serial.print(",\t");
     Serial.print((float)offsets[4], 5); Serial.print(",\t");
     Serial.print((float)offsets[5], 5); Serial.print("\n\n");
+}
+
+// int MPU6050_Base::mpu_set_sample_rate(unsigned short rate)
+// {
+//     unsigned char data;
+
+//     if (!(st.chip_cfg.sensors))
+//         return -1;
+
+//     if (st.chip_cfg.dmp_on)
+//         return -1;
+//     else {
+//         if (st.chip_cfg.lp_accel_mode) {
+//             if (rate && (rate <= 40)) {
+//                 /* Just stay in low-power accel mode. */
+//                 mpu_lp_accel_mode(rate);
+//                 return 0;
+//             }
+//             /* Requested rate exceeds the allowed frequencies in LP accel mode,
+//              * switch back to full-power mode.
+//              */
+//             mpu_lp_accel_mode(0);
+//         }
+//         if (rate < 4)
+//             rate = 4;
+//         else if (rate > 1000)
+//             rate = 1000;
+
+//         data = 1000 / rate - 1;
+//         if (i2c_write(st.hw->addr, st.reg->rate_div, 1, &data))
+//             return -1;
+
+//         st.chip_cfg.sample_rate = 1000 / (1 + data);
+
+//         /* Automatically set LPF to 1/2 sampling rate. */
+//         mpu_set_lpf(st.chip_cfg.sample_rate >> 1);
+//         return 0;
+//     }
+// }
+
+int MPU6050_Base::mpu_write_mem(unsigned short mem_addr, unsigned short length, unsigned char *data)
+{
+    unsigned char tmp[2];
+
+    tmp[0] = (unsigned char)(mem_addr >> 8);
+    tmp[1] = (unsigned char)(mem_addr & 0xFF);
+
+    /* Check bank boundaries. */
+    if (tmp[1] + length > 256)
+        return -1;
+    
+    if (!I2Cdev::writeBytes(devAddr, MPU6050_RA_BANK_SEL, 2, (uint8_t*)tmp, wireObj))
+        return -1;
+    if (!I2Cdev::writeBytes(devAddr, MPU6050_RA_MEM_R_W, length, (uint8_t*)data, wireObj))
+        return -1;
+    return 0;
 }
