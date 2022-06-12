@@ -1,7 +1,0 @@
-{
-    "port": "/dev/ttyUSB1",
-    "configuration": "cpu=atmega328old",
-    "board": "arduino:avr:nano",
-    "programmer": "arduino:avrisp",
-    "sketch": "Arduino/MPU6050/examples/MPU6050_DMP6_using_DMP_V6.12/MPU6050_DMP6_using_DMP_V6.12.ino"
-}

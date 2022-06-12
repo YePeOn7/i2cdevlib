@@ -122,7 +122,10 @@ class MPU6050_6Axis_MotionApps612 : public MPU6050_Base {
         uint8_t dmpGetEIS(int32_t *data, const uint8_t* packet=0);
         
         uint8_t dmpGetEuler(float *data, Quaternion *q);
+
         uint8_t dmpGetYawPitchRoll(float *data, Quaternion *q, VectorFloat *gravity);
+        uint8_t dmpGetYawPitchRoll(float *data);
+        uint8_t dmpGetYawPitchRoll(float *data, int16_t* acc, int16_t* gyro);
 
         // Get Floating Point data from FIFO
         uint8_t dmpGetAccelFloat(float *data, const uint8_t* packet=0);
@@ -145,23 +148,22 @@ class MPU6050_6Axis_MotionApps612 : public MPU6050_Base {
 
         int dmpSetEnableGyroCalibration(unsigned char enable);
         int dmpEnableFeature(unsigned short mask);
+        int dmpWaitForCalibration(float th, int timeOut);
+        int dmpGyroContinuosCalibration(int sampleTime, float threshold);
+        int dmpGyroContinuosCalibration(float* ypr, int sampleTime = 5000);
 
         int dmp_set_tap_thresh(unsigned char axis, unsigned short thresh);
         int dmp_set_tap_axes(unsigned char axis);
-        /**
- *  @brief      Set minimum number of taps needed for an interrupt.
- *  @param[in]  min_taps    Minimum consecutive taps (1-4).
- *  @return     0 if successful.
- */
-int dmp_set_tap_count(unsigned char min_taps);
-int dmp_set_tap_time(unsigned short time);
-int dmp_set_tap_time_multi(unsigned short time);
-int dmp_set_shake_reject_thresh(long sf, unsigned short thresh);
-int dmp_set_shake_reject_time(unsigned short time);
-int dmp_set_shake_reject_timeout(unsigned short time);
-int dmp_enable_lp_quat(unsigned char enable);
-int dmp_enable_6x_lp_quat(unsigned char enable);
-int dmp_set_fifo_rate(unsigned short rate);
+
+        int dmp_set_tap_count(unsigned char min_taps);
+        int dmp_set_tap_time(unsigned short time);
+        int dmp_set_tap_time_multi(unsigned short time);
+        int dmp_set_shake_reject_thresh(long sf, unsigned short thresh);
+        int dmp_set_shake_reject_time(unsigned short time);
+        int dmp_set_shake_reject_timeout(unsigned short time);
+        int dmp_enable_lp_quat(unsigned char enable);
+        int dmp_enable_6x_lp_quat(unsigned char enable);
+        int dmp_set_fifo_rate(unsigned short rate);
 
     private:
         uint8_t *dmpPacketBuffer;

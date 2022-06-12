@@ -3395,44 +3395,6 @@ void MPU6050_Base::PrintActiveOffsets() {
     Serial.print((float)offsets[5], 5); Serial.print("\n\n");
 }
 
-// int MPU6050_Base::mpu_set_sample_rate(unsigned short rate)
-// {
-//     unsigned char data;
-
-//     if (!(st.chip_cfg.sensors))
-//         return -1;
-
-//     if (st.chip_cfg.dmp_on)
-//         return -1;
-//     else {
-//         if (st.chip_cfg.lp_accel_mode) {
-//             if (rate && (rate <= 40)) {
-//                 /* Just stay in low-power accel mode. */
-//                 mpu_lp_accel_mode(rate);
-//                 return 0;
-//             }
-//             /* Requested rate exceeds the allowed frequencies in LP accel mode,
-//              * switch back to full-power mode.
-//              */
-//             mpu_lp_accel_mode(0);
-//         }
-//         if (rate < 4)
-//             rate = 4;
-//         else if (rate > 1000)
-//             rate = 1000;
-
-//         data = 1000 / rate - 1;
-//         if (i2c_write(st.hw->addr, st.reg->rate_div, 1, &data))
-//             return -1;
-
-//         st.chip_cfg.sample_rate = 1000 / (1 + data);
-
-//         /* Automatically set LPF to 1/2 sampling rate. */
-//         mpu_set_lpf(st.chip_cfg.sample_rate >> 1);
-//         return 0;
-//     }
-// }
-
 int MPU6050_Base::mpu_write_mem(unsigned short mem_addr, unsigned short length, unsigned char *data)
 {
     unsigned char tmp[2];
@@ -3449,4 +3411,24 @@ int MPU6050_Base::mpu_write_mem(unsigned short mem_addr, unsigned short length, 
     if (!I2Cdev::writeBytes(devAddr, MPU6050_RA_MEM_R_W, length, (uint8_t*)data, wireObj))
         return -1;
     return 0;
+}
+
+void MPU6050_Base::readGyroRaw(int16_t* data)
+{
+    uint8_t temp[6];
+    I2Cdev::readBytes(devAddr, MPU6050_RA_GYRO_XOUT_H, 6, temp, I2Cdev::readTimeout, wireObj);
+
+    data[0] = temp[0]<<8 | temp[1];
+    data[1] = temp[2]<<8 | temp[3];
+    data[2] = temp[4]<<8 | temp[5];
+}
+
+void MPU6050_Base::readAccRaw(int16_t* data)
+{
+    uint8_t temp[6];
+    I2Cdev::readBytes(devAddr, MPU6050_RA_ACCEL_XOUT_H, 6, temp, I2Cdev::readTimeout, wireObj);
+
+    data[0] = temp[0]<<8 | temp[1];
+    data[1] = temp[2]<<8 | temp[3];
+    data[2] = temp[4]<<8 | temp[5];
 }

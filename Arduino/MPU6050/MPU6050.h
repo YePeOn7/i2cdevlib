@@ -1226,8 +1226,12 @@ class MPU6050_Base {
 		int16_t * GetActiveOffsets();
 
         int mpu_set_sample_rate(unsigned short rate);
-
         int mpu_write_mem(unsigned short mem_addr, unsigned short length, unsigned char *data);
+
+        //Read Raw DATA
+        void readGyroRaw(int16_t* data);
+        void readAccRaw(int16_t* data);
+        
 
     protected:
         uint8_t devAddr;
